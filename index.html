@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icons8 404 Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>Oops! The page you're looking for has flown away.
+        While you're here, help a bird fly through pipes!</p>
+        
+        <div class="test-object-container">
+            <div class="game-outer-container">
+                <div class="game-container">
+                    <div id="game-area">
+                        <div id="bird" class="bird"></div>
+                        <div id="brand-text">ICONS8</div>
+                        <div id="score">0</div>
+                        <div id="start-message">PRESS SPACE OR TOUCH THE SCREEN TO START THE GAME</div>
+                        <div id="game-over" class="hidden">GAME OVER!<br>YOUR SCORE: <span id="final-score">0</span><br>PRESS SPACE OR TOUCH THE SCREEN FOR A NEW GAME</div>
+                    </div>
+                    <div class="grid-overlay"></div>
+                    <div class="game-frame-shadow"></div>
+                    <div class="game-frame"></div>
+                </div>
+            </div>
+            
+            <div class="speaker-frame">
+                <div class="speaker-bar"></div>
+                <div class="speaker-bar"></div>
+                <div class="speaker-bar"></div>
+            </div>
+            
+            <div class="test-object">
+                <div class="frame-48098629">
+                    <div class="frame-union">
+                        <button class="device-button-circle jump-button">
+                            <img src="jump.svg" alt="Jump" width="40" height="40">
+                        </button>
+                        <button class="device-button-circle restart-button">
+                            <img src="restart.svg" alt="Restart" width="40" height="40">
+                        </button>
+                    </div>
+                </div>
+                <button class="device-button" onclick="window.location.href='https://icons8.com'">Go to home page</button>
+            </div>
+            <p class="attribution-text"><a href="https://icons8.com/icon/2qjU9IcT2Yjt/bird">Bird icon</a> from <a href="https://icons8.com/icons/pixels">Pixel icon pack</a></p>
+        </div>
+        <button class="mobile-home-button" onclick="window.location.href='https://icons8.com'">Go to home page</button>
+    </div>    
+    <script src="game.js" defer></script>
+</body>
+</html>

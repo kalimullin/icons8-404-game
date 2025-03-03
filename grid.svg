@@ -1,0 +1,29 @@
+<svg width="740" height="340" viewBox="0 0 740 340" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g clip-path="url(#clip0_17563_19594)">
+<rect opacity="0.08" x="38.6279" y="-226" width="343.132" height="705.256" transform="rotate(30 38.6279 -226)" fill="url(#paint0_linear_17563_19594)" style=""/>
+<rect opacity="0.08" x="589.89" y="-169" width="143.384" height="687.779" transform="rotate(30 589.89 -169)" fill="url(#paint1_linear_17563_19594)" style=""/>
+<rect opacity="0.08" x="836.774" y="-213" width="324.274" height="685.829" transform="rotate(30 836.774 -213)" fill="url(#paint2_linear_17563_19594)" style=""/>
+<rect width="740" height="340" fill="url(#pattern0_17563_19594)" fill-opacity="0.05" style=""/>
+</g>
+<defs>
+<pattern id="pattern0_17563_19594" patternContentUnits="objectBoundingBox" width="0.00540541" height="0.0117647">
+<use xlink:href="#image0_17563_19594" transform="scale(0.000675676 0.00147059)"/>
+</pattern>
+<linearGradient id="paint0_linear_17563_19594" x1="381.76" y1="166.818" x2="121.73" y2="63.1934" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.6" style="stop-color:white;stop-opacity:0.6;"/>
+<stop offset="1" stop-color="white" style="stop-color:white;stop-opacity:1;"/>
+</linearGradient>
+<linearGradient id="paint1_linear_17563_19594" x1="708.415" y1="285.071" x2="589.765" y2="214.083" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.6" style="stop-color:white;stop-opacity:0.6;"/>
+<stop offset="1" stop-color="white" style="stop-color:white;stop-opacity:1;"/>
+</linearGradient>
+<linearGradient id="paint2_linear_17563_19594" x1="1138.94" y1="250.767" x2="858.599" y2="87.2272" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" stop-opacity="0.6" style="stop-color:white;stop-opacity:0.6;"/>
+<stop offset="1" stop-color="white" style="stop-color:white;stop-opacity:1;"/>
+</linearGradient>
+<clipPath id="clip0_17563_19594">
+<rect width="740" height="340" rx="36" fill="white" style="fill:white;fill-opacity:1;"/>
+</clipPath>
+<image id="image0_17563_19594" width="8" height="8" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAABxJREFUKFNjZGBg+M/AwMDIgAOAJIaPAly+ZAAAia8ICF5VX0MAAAAASUVORK5CYII="/>
+</defs>
+</svg>
