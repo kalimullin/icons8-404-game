@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] DOMContentLoaded сработал');
+    console.log('[DEBUG] DOMContentLoaded triggered');
     
-    // Получаем элементы DOM
+    // Get DOM elements
     const gameArea = document.getElementById('game-area');
     const bird = document.getElementById('bird');
     const scoreDisplay = document.getElementById('score');
@@ -11,52 +11,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const jumpButton = document.querySelector('.jump-button');
     const restartButton = document.querySelector('.restart-button');
     
-    // Определяем браузер пользователя
+    // Detect user's browser
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    console.log('[DEBUG] Браузер Safari:', isSafari);
+    console.log('[DEBUG] Browser Safari:', isSafari);
     
-    // Настройка звука
+    // Audio setup
     let audioContext = null;
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     } catch (e) {
-        console.log('[DEBUG] Ошибка создания AudioContext:', e);
+        console.log('[DEBUG] Error creating AudioContext:', e);
     }
     
-    // ID для анимации
+    // Animation IDs
     let animationFrameId = null;
     let demoAnimationId = null;
     
-    // НАСТРОЙКИ ИГРЫ
-    // Настройки для гравитации и прыжка
-    const gravity = 0.4;        // Увеличенная гравитация для всех браузеров
-    const jumpStrength = -7;    // Более сильный прыжок
+    // GAME SETTINGS
+    // Gravity and jump settings
+    const gravity = 0.4;        // Increased gravity for all browsers
+    const jumpStrength = -7;    // Stronger jump
     
-    // Настройка труб
+    // Pipe settings
     const pipeWidth = 52;
-    const pipeGap = 170; // Уменьшенный промежуток между верхней и нижней трубой
-    const pipeInterval = 1300; // Уменьшен интервал для более частого появления труб
+    const pipeGap = 170; // Reduced gap between top and bottom pipes
+    const pipeInterval = 1300; // Reduced interval for more frequent pipe spawning
     
-    // Настройка скорости
-    const baseSpeed = isSafari ? 3.5 : 3.8; // Увеличена скорость для Chrome
+    // Speed settings
+    const baseSpeed = isSafari ? 3.5 : 3.8; // Increased speed for Chrome
     
-    // Настройка времени и анимации
+    // Time and animation settings
     let lastUpdateTime = 0;
-    let gracePeriod = 50;  // Период без проверки столкновений в начале игры
+    let gracePeriod = 50;  // Period without collision checks at game start
     
-    // Состояние игры
+    // Game state
     let gameStarted = false;
     let gameOver = false;
+    let canRestartGame = true; // New flag to control restart ability
     let score = 0;
     let birdY = gameArea.clientHeight / 2;
     let birdVelocity = 0;
     let pipes = [];
     let lastPipeTime = 0;
 
-    // Настройка звука
+    // Sound settings
     let isSoundEnabled = true;
     
-    // Обновляем размеры при изменении окна
+    // Update game dimensions on window resize
     function updateGameDimensions() {
         gameAreaWidth = gameArea.clientWidth;
         
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        console.log('[DEBUG] Размеры обновлены, scale:', scale);
+        console.log('[DEBUG] Dimensions updated, scale:', scale);
     }
     
     window.addEventListener('resize', updateGameDimensions);
@@ -145,54 +146,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Проверка наличия необходимых элементов DOM
+    // Check for required DOM elements
     if (!gameArea || !bird || !scoreDisplay || !startMessage || !gameOverMessage) {
-        console.error('Не удалось найти необходимые элементы DOM');
+        console.error('Failed to find required DOM elements');
         return;
     }
     
-    console.log('[DEBUG] Все DOM элементы найдены');
+    console.log('[DEBUG] All DOM elements found');
     
-    // Инициализация игры
+    // Game initialization
     function init() {
-        console.log('[DEBUG] Инициализация игры');
+        console.log('[DEBUG] Game initialization');
         
-        // Сбрасываем состояние
+        // Reset state
         gameStarted = false;
         gameOver = false;
         score = 0;
         scoreDisplay.textContent = '0';
         
-        // Скрываем сообщение о конце игры
+        // Hide game over message
         gameOverMessage.classList.add('hidden');
         
-        // Показываем стартовое сообщение
+        // Show start message
         startMessage.classList.remove('hidden');
         
-        // Устанавливаем начальную позицию птицы
+        // Set initial bird position
         birdY = gameArea.clientHeight * 0.4;
         birdVelocity = 0;
         bird.style.top = Math.floor(birdY) + 'px';
         bird.style.transform = 'translateY(-50%) rotate(0deg)';
         
-        // Удаляем все существующие трубы
+        // Remove all existing pipes
         pipes.forEach(pipe => {
             if (pipe.top.parentNode) gameArea.removeChild(pipe.top);
             if (pipe.bottom.parentNode) gameArea.removeChild(pipe.bottom);
         });
         pipes = [];
         
-        // Создаем демо-сцену
+        // Create demo scene
         createDemoScene();
     }
     
-    // Создание демонстрационной сцены
+    // Create demo scene
     function createDemoScene() {
-        console.log('[DEBUG] Создание демо-сцены');
+        console.log('[DEBUG] Creating demo scene');
         
-        // Создаем трубы, первая должна быть видна сразу
-        createPipeAt(gameArea.clientWidth * 0.7); // Первая труба видна на экране при загрузке
-        createPipeAt(gameArea.clientWidth * 1.3); // Вторая труба подготовлена справа
+        // Create pipes, first one should be visible immediately
+        createPipeAt(gameArea.clientWidth * 0.7); // First pipe visible on screen at load
+        createPipeAt(gameArea.clientWidth * 1.3); // Second pipe prepared on the right
         
         birdY = gameArea.clientHeight * 0.4;
         bird.style.top = Math.floor(birdY) + 'px';
@@ -227,9 +228,9 @@ document.addEventListener('DOMContentLoaded', function() {
         demoAnimationId = requestAnimationFrame(animate);
     }
     
-    // Создание трубы в указанной позиции (для демо-сцены)
+    // Create pipe at specified position (for demo scene)
     function createPipeAt(xPosition) {
-        console.log('[DEBUG] Создание трубы в позиции:', xPosition);
+        console.log('[DEBUG] Creating pipe at position:', xPosition);
         const pipeTop = document.createElement('div');
         const pipeBottom = document.createElement('div');
         
@@ -238,20 +239,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const gameAreaHeight = gameArea.clientHeight;
         
-        // Используем переданную позицию X
+        // Use passed X position
         const baseWidth = 700;
         const scale = Math.min(1, gameArea.clientWidth / baseWidth);
         const currentPipeWidth = Math.floor(pipeWidth * scale);
         
-        // Для первой демонстрационной трубы используем среднюю высоту
+        // For first demo pipe use medium height
         const variation = Math.random();
         let pipeTopHeight;
         
         if (variation < 0.5) {
-            // 40-50% высоты для первой демо-трубы
+            // 40-50% height for first demo pipe
             pipeTopHeight = Math.floor(gameAreaHeight * (0.4 + 0.1 * Math.random()));
         } else {
-            // 30-40% высоты для второй демо-трубы (немного ниже)
+            // 30-40% height for second demo pipe (slightly lower)
             pipeTopHeight = Math.floor(gameAreaHeight * (0.3 + 0.1 * Math.random()));
         }
         
@@ -280,53 +281,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Начало игры
+    // Game start
     function startGame() {
         if (gameOver) {
-            // Если игра уже закончилась, то начинаем заново
+            // If game is over, start new game
             resetGame();
         }
 
-        if (gameStarted) return; // Предотвращаем повторный запуск
+        if (gameStarted) return; // Prevent multiple starts
 
-        console.log('[DEBUG] Начало игры');
+        console.log('[DEBUG] Game start');
         
-        // Сбрасываем счетчик
+        // Reset score
         score = 0;
         scoreDisplay.textContent = score;
         
-        // Скрываем стартовое сообщение
+        // Hide start message
         startMessage.classList.add('hidden');
         
-        // Устанавливаем начальную позицию птицы 
+        // Set initial bird position
         birdY = gameArea.clientHeight * 0.4;
         birdVelocity = 0;
         bird.style.top = Math.floor(birdY) + 'px';
         bird.style.transform = 'translateY(-50%) rotate(0deg)';
         
-        // Инициализируем время и защитный период
+        // Initialize time and grace period
         lastUpdateTime = performance.now();
         lastPipeTime = Date.now();
-        gracePeriod = isSafari ? 70 : 50; // Больше защитное время для Safari
+        gracePeriod = isSafari ? 70 : 50; // Longer grace period for Safari
         
-        // Удаляем все существующие трубы
+        // Remove all existing pipes
         pipes.forEach(pipe => {
             if (pipe.top.parentNode) gameArea.removeChild(pipe.top);
             if (pipe.bottom.parentNode) gameArea.removeChild(pipe.bottom);
         });
         pipes = [];
         
-        // Создаем первую трубу
+        // Create first pipe
         createPipe();
         
-        // Показываем птицу
+        // Show bird
         bird.classList.remove('hidden');
         
-        // Устанавливаем игровое состояние
+        // Set game state
         gameStarted = true;
         gameOver = false;
         
-        // Запускаем анимацию
+        // Start animation
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
         }
@@ -354,9 +355,9 @@ document.addEventListener('DOMContentLoaded', function() {
         playJumpSound();
     }
 
-    // Создание новой трубы
+    // Create new pipe
     function createPipe() {
-        console.log('[DEBUG] Создание новой трубы');
+        console.log('[DEBUG] Creating new pipe');
         const pipeTop = document.createElement('div');
         const pipeBottom = document.createElement('div');
         
@@ -366,31 +367,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const gameAreaWidth = gameArea.clientWidth;
         const gameAreaHeight = gameArea.clientHeight;
         
-        // Устанавливаем начальную позицию справа от игрового поля
+        // Set initial position right of game area
         const startPosition = gameAreaWidth;
         
         const baseWidth = 700;
         const scale = Math.min(1, gameAreaWidth / baseWidth);
         const currentPipeWidth = Math.floor(pipeWidth * scale);
         
-        // Более разнообразные настройки высоты для труб
-        const minTopHeight = 30;  // Минимальная высота (уменьшена)
-        const maxTopHeight = gameAreaHeight - pipeGap - 60;  // Максимальная высота трубы
+        // More varied height settings for pipes
+        const minTopHeight = 30;  // Minimum height (reduced)
+        const maxTopHeight = gameAreaHeight - pipeGap - 60;  // Maximum pipe height
         
-        // Использование полного диапазона и добавление случайности
+        // Use full range and add randomness
         let variation = Math.random();
         
-        // Случайное распределение: предпочитаем различные высоты
-        // Иногда очень низкие, иногда средние, иногда высокие
+        // Random distribution: prefer different heights
+        // Sometimes very low, sometimes medium, sometimes high
         let pipeTopHeight;
         if (variation < 0.3) {
-            // Низкие трубы (30-40% от диапазона)
+            // Low pipes (30-40% of range)
             pipeTopHeight = Math.floor(minTopHeight + (maxTopHeight - minTopHeight) * 0.3 * Math.random());
         } else if (variation < 0.7) {
-            // Средние трубы (40-60% от диапазона)
+            // Medium pipes (40-60% of range)
             pipeTopHeight = Math.floor(minTopHeight + (maxTopHeight - minTopHeight) * (0.4 + 0.2 * Math.random()));
         } else {
-            // Высокие трубы (60-100% от диапазона)
+            // High pipes (60-100% of range)
             pipeTopHeight = Math.floor(minTopHeight + (maxTopHeight - minTopHeight) * (0.6 + 0.4 * Math.random()));
         }
         
@@ -419,81 +420,91 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Обновление состояния игры
+    // Game update
     function update(timestamp) {
         if (!gameStarted || gameOver) {
             requestAnimationFrame(update);
             return;
         }
 
-        // Вычисляем deltaTime и следим за временем отрисовки
+        // Calculate deltaTime and track render time
         if (!timestamp) timestamp = performance.now();
         
-        const deltaTime = Math.min(timestamp - lastUpdateTime, 25); // Ограничиваем дельту для более быстрой анимации
+        const deltaTime = Math.min(timestamp - lastUpdateTime, 25); // Limit delta for faster animation
         lastUpdateTime = timestamp;
 
-        // Нормализованный множитель времени с увеличенным базовым значением
-        const targetFrameTime = 16; // базовое время кадра (~60 FPS)
-        const timeMultiplier = deltaTime / targetFrameTime * 1.2; // Увеличиваем множитель времени на 20%
+        // Normalized time multiplier with increased base value
+        const targetFrameTime = 16; // base frame time (~60 FPS)
+        const timeMultiplier = deltaTime / targetFrameTime * 1.2; // Increase time multiplier by 20%
             
-        // Уменьшаем защитный период
+        // Decrease grace period
         if (gracePeriod > 0) {
             gracePeriod--;
         }
         
-        // Обновляем позицию птицы с учетом множителя времени
+        // Update bird position with time multiplier
         birdVelocity += gravity * timeMultiplier;
         birdY += birdVelocity * timeMultiplier;
 
-        // Перемещаем птицу визуально
+        // Move bird visually
         bird.style.top = Math.floor(birdY) + 'px';
         
-        // Добавляем покачивание птицы
+        // Add bird rotation
         const rotationAngle = Math.max(-20, Math.min(20, birdVelocity * 2));
         bird.style.transform = `translateY(-50%) rotate(${rotationAngle}deg)`;
         
-        // Создаем новую трубу через интервалы
+        // Create new pipe at intervals
         const currentTime = Date.now();
         if (currentTime - lastPipeTime > pipeInterval) {
             createPipe();
             lastPipeTime = currentTime;
         }
         
-        // Обновляем трубы с учетом множителя
+        // Update pipes with multiplier
         const effectiveSpeed = baseSpeed * timeMultiplier;
         
-        // Перебираем трубы для обновления их позиций и проверки столкновений
+        // Iterate pipes to update positions and check collisions
         pipes.forEach((pipe, index) => {
             pipe.x -= effectiveSpeed;
             pipe.top.style.left = Math.floor(pipe.x) + 'px';
             pipe.bottom.style.left = Math.floor(pipe.x) + 'px';
             
-            // Проверяем пройденные трубы для подсчета очков
+            // Check passed pipes for score
             if (!pipe.passed && pipe.x + pipe.width < 50) {
                 pipe.passed = true;
                 score++;
                 scoreDisplay.textContent = score;
-                console.log(`[DEBUG] Очки: ${score}`);
+                console.log(`[DEBUG] Score: ${score}`);
             }
             
-            // Проверяем столкновения с трубами только если закончился защитный период
+            // Check pipe collisions only after grace period
             if (gracePeriod <= 0) {
+                // Configure hitboxes considering bird's visual representation
+                const birdTopOffset = 14;    // Top offset for more accurate hitbox
+                const birdBottomOffset = 14; // Bottom offset for more accurate hitbox
+                const birdSideOffset = 12;   // Side offset
+                
+                // Real bird position considering transform: translateY(-50%)
+                const actualBirdY = birdY - bird.clientHeight / 2;
+                
                 const hasCollision = 
-                    (birdY < parseInt(pipe.top.style.height) + 4 && 
-                    pipe.x < 50 + bird.clientWidth - 2 && 
-                    pipe.x + pipe.width > 50 + 2) ||
-                    (birdY + bird.clientHeight > gameArea.clientHeight - parseInt(pipe.bottom.style.height) + 2 && 
-                    pipe.x < 50 + bird.clientWidth - 2 && 
-                    pipe.x + pipe.width > 50 + 2);
+                    // Check collision with top pipe (reduced collision zone at top)
+                    (actualBirdY + birdTopOffset < parseInt(pipe.top.style.height) && 
+                    pipe.x < 50 + bird.clientWidth - birdSideOffset && 
+                    pipe.x + pipe.width > 50 + birdSideOffset) ||
+                    // Check collision with bottom pipe (reduced collision zone at bottom)
+                    (actualBirdY + bird.clientHeight - birdBottomOffset > gameArea.clientHeight - parseInt(pipe.bottom.style.height) && 
+                    pipe.x < 50 + bird.clientWidth - birdSideOffset && 
+                    pipe.x + pipe.width > 50 + birdSideOffset);
                 
                 if (hasCollision) {
-                    console.log('[DEBUG] Столкновение с трубой');
+                    console.log('[DEBUG] Collision with pipe');
                     endGame();
                     return;
                 }
             }
             
-            // Удаляем трубы, которые вышли за пределы экрана
+            // Remove pipes that are off screen
             if (pipe.x + pipe.width < 0) {
                 gameArea.removeChild(pipe.top);
                 gameArea.removeChild(pipe.bottom);
@@ -501,39 +512,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Проверяем столкновение с границами после защитного периода
+        // Check boundary collisions after grace period
         if (gracePeriod <= 0 && (birdY < 0 || birdY + bird.clientHeight > gameArea.clientHeight)) {
-            console.log('[DEBUG] Столкновение с границей, позиция птицы:', birdY);
+            console.log('[DEBUG] Collision with boundary, bird position:', birdY);
             endGame();
             return;
         }
         
-        // Продолжаем обновление анимации
+        // Continue animation update
         requestAnimationFrame(update);
     }
 
-    // Завершение игры
+    // End game
     function endGame() {
-        if (gameOver) return; // Защита от повторного вызова
+        if (gameOver) return; // Prevent multiple calls
         
-        console.log('[DEBUG] Конец игры, счет:', score);
+        console.log('[DEBUG] Game over, score:', score);
         
-        // Устанавливаем состояние конца игры
+        // Set game over state
         gameStarted = false;
         gameOver = true;
+        canRestartGame = false; // Block restart ability
         
-        // Останавливаем анимацию
+        // Stop animation
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
         }
         
-        // Обновляем и показываем сообщение о конце игры
+        // Update and show game over message
         finalScoreDisplay.textContent = score;
         gameOverMessage.classList.remove('hidden');
         
-        // Воспроизводим звук конца игры
+        // Play game over sound
         playEndGameSound();
+
+        // Add delay before restart is possible
+        setTimeout(() => {
+            canRestartGame = true;
+            console.log('[DEBUG] New game can be started');
+        }, 2000);
     }
     
     // Звук окончания игры
@@ -581,41 +599,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Сброс и перезапуск игры
+    // Reset and restart game
     function resetGame() {
-        console.log('[DEBUG] Сброс игры');
+        console.log('[DEBUG] Game reset');
         
-        // Сбрасываем счетчик
+        // Reset score
         score = 0;
         scoreDisplay.textContent = score;
         
-        // Скрываем сообщение о конце игры
+        // Hide game over message
         gameOverMessage.classList.add('hidden');
         
-        // Сбрасываем состояние игры
+        // Reset game state
         gameStarted = false;
         gameOver = false;
         
-        // Устанавливаем начальную позицию птицы
+        // Set initial bird position
         birdY = gameArea.clientHeight * 0.4;
         birdVelocity = 0;
         bird.style.top = Math.floor(birdY) + 'px';
         bird.style.transform = 'translateY(-50%) rotate(0deg)';
         
-        // Удаляем все существующие трубы
+        // Remove all existing pipes
         pipes.forEach(pipe => {
             if (pipe.top.parentNode) gameArea.removeChild(pipe.top);
             if (pipe.bottom.parentNode) gameArea.removeChild(pipe.bottom);
         });
         pipes = [];
         
-        // Показываем стартовое сообщение
+        // Show start message
         startMessage.classList.remove('hidden');
     }
 
-    // Унифицированный обработчик событий
+    // Unified event handler
     function handleInteraction(e) {
-        console.log('[DEBUG] Вызван handleInteraction, тип события:', e.type);
+        console.log('[DEBUG] handleInteraction called, event type:', e.type);
         
         if (e && e.preventDefault) {
             e.preventDefault();
@@ -625,7 +643,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
         }
         
-        if (!gameStarted || gameOver) {
+        if (!gameStarted) {
+            if (gameOver && !canRestartGame) {
+                console.log('[DEBUG] Please wait before starting a new game');
+                return;
+            }
             startGame();
         } else {
             jump();
@@ -638,7 +660,11 @@ document.addEventListener('DOMContentLoaded', function() {
     jumpButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!gameStarted || gameOver) {
+        if (!gameStarted) {
+            if (gameOver && !canRestartGame) {
+                console.log('[DEBUG] Подождите перед началом новой игры');
+                return;
+            }
             startGame();
         } else {
             jump();
@@ -648,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
     restartButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (gameOver || !gameStarted) {
+        if ((gameOver || !gameStarted) && canRestartGame) {
             init();
             startGame();
         }
