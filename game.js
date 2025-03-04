@@ -299,16 +299,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide start message
         startMessage.classList.add('hidden');
         
-        // Set initial bird position
+        // Set initial bird position and velocity for smooth start
         birdY = gameArea.clientHeight * 0.4;
-        birdVelocity = 0;
+        birdVelocity = -1; // Более мягкая начальная скорость вверх
         bird.style.top = Math.floor(birdY) + 'px';
-        bird.style.transform = 'translateY(-50%) rotate(0deg)';
+        bird.style.transform = 'translateY(-50%) rotate(-5deg)'; // Меньший наклон вверх
         
         // Initialize time and grace period
         lastUpdateTime = performance.now();
         lastPipeTime = Date.now();
-        gracePeriod = isSafari ? 70 : 50; // Longer grace period for Safari
+        gracePeriod = 120; // Увеличенный период без столкновений
         
         // Remove all existing pipes
         pipes.forEach(pipe => {
@@ -442,8 +442,15 @@ document.addEventListener('DOMContentLoaded', function() {
             gracePeriod--;
         }
         
-        // Update bird position with time multiplier
-        birdVelocity += gravity * timeMultiplier;
+        // Calculate dynamic gravity based on grace period
+        const initialGravity = 0.1; // Очень слабая начальная гравитация
+        const gravityTransitionPeriod = 100; // Период перехода к полной гравитации
+        const currentGravity = gracePeriod > gravityTransitionPeriod 
+            ? initialGravity 
+            : initialGravity + (gravity - initialGravity) * (1 - gracePeriod / gravityTransitionPeriod);
+        
+        // Update bird position with time multiplier and dynamic gravity
+        birdVelocity += currentGravity * timeMultiplier;
         birdY += birdVelocity * timeMultiplier;
 
         // Move bird visually
