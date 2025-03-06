@@ -296,7 +296,7 @@ p {
     z-index: 300;
 }
 
-/* Медиа-запросы для адаптивности */
+/* Media queries for responsiveness */
 @media (max-width: 768px) {
     .speaker-frame {
         top: 360px !important;

@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.addEventListener('resize', updateGameDimensions);
 
-    // Функция для воспроизведения звука
+    // Function for playing sound
     function playSound(frequency, volume = 0.1, duration = 0.08) {
         if (!audioContext) return;
         
@@ -122,13 +122,13 @@ document.addEventListener('DOMContentLoaded', function() {
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // Используем треугольную волну для мягкого звучания
+            // Use triangle wave for soft sound
             oscillator.type = 'triangle';
             
-            // Настраиваем частоту звука
+            // Set sound frequency
             oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
             
-            // Настраиваем громкость
+            // Set volume
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.02);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
@@ -136,11 +136,11 @@ document.addEventListener('DOMContentLoaded', function() {
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + duration);
         } catch (e) {
-            console.log('[DEBUG] Ошибка воспроизведения звука:', e);
+            console.log('[DEBUG] Sound playback error:', e);
         }
     }
     
-    // Функция для звука прыжка
+    // Function for jump sound
     function playJumpSound() {
         if (!audioContext) return;
         
@@ -151,14 +151,14 @@ document.addEventListener('DOMContentLoaded', function() {
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // Используем треугольную волну для очень мягкого звучания
+            // Use triangle wave for very soft sound
             oscillator.type = 'triangle';
             
-            // Очень короткий и высокий звук, как "пиу"
+            // Very short and high sound, like "peew"
             oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
             oscillator.frequency.exponentialRampToValueAtTime(2400, audioContext.currentTime + 0.06);
             
-            // Очень мягкая атака и затухание
+            // Very soft attack and decay
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.02);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
@@ -166,9 +166,9 @@ document.addEventListener('DOMContentLoaded', function() {
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.08);
             
-            console.log('[DEBUG] Звук прыжка воспроизведен');
+            console.log('[DEBUG] Jump sound played');
         } catch (e) {
-            console.log('[DEBUG] Ошибка воспроизведения звука:', e);
+            console.log('[DEBUG] Jump sound playback error:', e);
         }
     }
     
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         animateBirdManually();
     }
     
-    // Ручная анимация птицы вместо CSS
+    // Manual bird animation instead of CSS
     function animateBirdManually() {
         console.log('[DEBUG] Starting manual bird animation');
         
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Set initial bird position and velocity for smooth start
         birdY = gameArea.clientHeight * 0.6;
-        birdVelocity = -8; // Уменьшаем начальный импульс вверх с -12 до -8
+        birdVelocity = -8; // Reduced initial upward impulse from -12 to -8
         bird.style.top = Math.floor(birdY) + 'px';
         bird.style.transform = 'translateY(-50%) rotate(-25deg)';
         
@@ -476,13 +476,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Calculate dynamic gravity based on grace period
-        const initialGravity = 0.001; // Немного увеличиваем начальную гравитацию
-        const gravityTransitionPeriod = 400; // Оставляем тот же период перехода
+        const initialGravity = 0.001; // Slightly increased initial gravity
+        const gravityTransitionPeriod = 400; // Keep the same transition period
         const currentGravity = gracePeriod > 0 
             ? initialGravity + (gravity - initialGravity) * ((gravityTransitionPeriod - gracePeriod) / gravityTransitionPeriod)
             : gravity;
         
-        // Отладочный вывод каждые 30 кадров
+        // Debug output every 30 frames
         if (gracePeriod % 30 === 0) {
             console.log(`[DEBUG] Current gravity: ${currentGravity}, Grace period: ${gracePeriod}`);
         }
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Check boundary collisions - верхнюю границу проверяем после grace period, нижнюю - всегда
+        // Check boundary collisions - check top boundary after grace period, bottom boundary always
         if (birdY < 0 && gracePeriod <= 0) {
             console.log('[DEBUG] Collision with top boundary, bird position:', birdY);
             endGame();
@@ -604,12 +604,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // Звук окончания игры
+    // Game over sound
     function playEndGameSound() {
         if (!audioContext) return;
         
         try {
-            // Первый звук
+            // First sound
             const oscillator1 = audioContext.createOscillator();
             const gainNode1 = audioContext.createGain();
             
@@ -626,7 +626,7 @@ document.addEventListener('DOMContentLoaded', function() {
             oscillator1.start(audioContext.currentTime);
             oscillator1.stop(audioContext.currentTime + 0.5);
             
-            // Второй звук с задержкой
+            // Second sound with delay
             setTimeout(() => {
                 const oscillator2 = audioContext.createOscillator();
                 const gainNode2 = audioContext.createGain();
@@ -645,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 oscillator2.stop(audioContext.currentTime + 0.5);
             }, 300);
         } catch (e) {
-            console.log('[DEBUG] Ошибка воспроизведения звука окончания игры:', e);
+            console.log('[DEBUG] Game over sound playback error:', e);
         }
     }
 
@@ -693,7 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
         }
         
-        // Проверяем, не отображается ли загрузочный экран
+        // Check if loading screen is visible
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
             console.log('[DEBUG] Cannot handle interaction while loading screen is visible');
@@ -713,12 +713,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     }
 
-    // Обработчики для кнопок
+    // Button handlers
     jumpButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         
-        // Проверяем, не отображается ли загрузочный экран
+        // Check if loading screen is visible
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
             console.log('[DEBUG] Cannot jump while loading screen is visible');
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!gameStarted) {
             if (gameOver && !canRestartGame) {
-                console.log('[DEBUG] Подождите перед началом новой игры');
+                console.log('[DEBUG] Please wait before starting a new game');
                 return;
             }
             startGame();
@@ -745,34 +745,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Обработчики событий
+    // Event handlers
     document.addEventListener('keydown', (e) => {
-        console.log('[DEBUG] Нажата клавиша:', e.code || e.keyCode);
+        console.log('[DEBUG] Key pressed:', e.code || e.keyCode);
         
         if (e.code === 'Space' || e.keyCode === 32) {
             handleInteraction(e);
         }
     }, { capture: true });
 
-    // Добавляем обработчики с захватом, чтобы они выполнялись первыми
+    // Add handlers with capture to ensure they execute first
     gameArea.addEventListener('click', handleInteraction, { capture: true });
     gameArea.addEventListener('touchstart', handleInteraction, { passive: false, capture: true });
     
-    // Явно вызываем функции настройки
+    // Explicitly call setup functions
     updateGameDimensions();
     
-    // Инициализация при полной загрузке страницы
+    // Initialization on full page load
     if (document.readyState === 'complete') {
-        console.log('[DEBUG] Документ уже загружен, запускаем инициализацию');
+        console.log('[DEBUG] Document already loaded, starting initialization');
         init();
     } else {
         window.addEventListener('load', () => {
-            console.log('[DEBUG] Событие load, запускаем инициализацию');
+            console.log('[DEBUG] Load event, starting initialization');
             init();
         });
         
-        // Также запускаем инициализацию сразу
-        console.log('[DEBUG] Запускаем инициализацию сразу');
+        // Also start initialization immediately
+        console.log('[DEBUG] Starting initialization immediately');
         init();
     }
 }); 
