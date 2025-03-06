@@ -1,6 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[DEBUG] DOMContentLoaded triggered');
     
+    // Loading screen logic
+    const loadingScreen = document.getElementById('loading-screen');
+    const minLoadingTime = 2000; // Minimum time to display loading screen (2 seconds)
+    const startTime = Date.now();
+    
+    // Function to hide loading screen
+    function hideLoadingScreen() {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - startTime;
+        
+        if (elapsedTime < minLoadingTime) {
+            // If less than minimum time has passed, wait for remaining time
+            setTimeout(hideLoadingScreen, minLoadingTime - elapsedTime);
+            return;
+        }
+        
+        loadingScreen.classList.add('hidden');
+        // Remove loading screen after animation completion
+        setTimeout(() => {
+            loadingScreen.remove();
+        }, 200); // Reduce time before removing element
+    }
+    
+    // Start hiding loading screen after all resources are loaded
+    window.addEventListener('load', hideLoadingScreen);
+    
     // Get DOM elements
     const gameArea = document.getElementById('game-area');
     const bird = document.getElementById('bird');
@@ -203,18 +229,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Ручная анимация птицы вместо CSS
     function animateBirdManually() {
-        console.log('[DEBUG] Запуск ручной анимации птицы');
+        console.log('[DEBUG] Starting manual bird animation');
         
         let time = 0;
-        const animationDuration = 2000; // 2 секунды
+        const animationDuration = 2000; // 2 seconds
         
         function animate() {
             if (gameStarted) return;
             
-            time += 16; // примерно 60 fps
+            time += 16; // approximately 60 fps
             if (time > animationDuration) time = 0;
             
-            // Анимация только птицы
+            // Bird animation only
             const progress = time / animationDuration;
             const offset = Math.sin(progress * Math.PI * 2) * 20;
             const rotation = Math.sin(progress * Math.PI * 2) * 5;
@@ -283,6 +309,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Game start
     function startGame() {
+        // Check if loading screen is visible
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            console.log('[DEBUG] Cannot start game while loading screen is visible');
+            return;
+        }
+
         if (gameOver) {
             // If game is over, start new game
             resetGame();
@@ -300,15 +333,15 @@ document.addEventListener('DOMContentLoaded', function() {
         startMessage.classList.add('hidden');
         
         // Set initial bird position and velocity for smooth start
-        birdY = gameArea.clientHeight * 0.4;
-        birdVelocity = -1; // Более мягкая начальная скорость вверх
+        birdY = gameArea.clientHeight * 0.6;
+        birdVelocity = -8; // Уменьшаем начальный импульс вверх с -12 до -8
         bird.style.top = Math.floor(birdY) + 'px';
-        bird.style.transform = 'translateY(-50%) rotate(-5deg)'; // Меньший наклон вверх
+        bird.style.transform = 'translateY(-50%) rotate(-25deg)';
         
         // Initialize time and grace period
         lastUpdateTime = performance.now();
         lastPipeTime = Date.now();
-        gracePeriod = 120; // Увеличенный период без столкновений
+        gracePeriod = 120;
         
         // Remove all existing pipes
         pipes.forEach(pipe => {
@@ -334,24 +367,24 @@ document.addEventListener('DOMContentLoaded', function() {
         animationFrameId = requestAnimationFrame(update);
     }
 
-    // Функция прыжка
+    // Jump function
     function jump() {
         if (gameOver) {
-            // Если игра окончена, то перезапускаем
+            // If game is over, restart
             resetGame();
             startGame();
             return;
         }
         
         if (!gameStarted) {
-            // Если игра не началась, то запускаем
+            // If game hasn't started, start it
             startGame();
         }
         
-        // Устанавливаем скорость птицы для прыжка
+        // Set bird velocity for jump
         birdVelocity = jumpStrength;
         
-        // Воспроизводим звук прыжка
+        // Play jump sound
         playJumpSound();
     }
 
@@ -443,11 +476,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Calculate dynamic gravity based on grace period
-        const initialGravity = 0.1; // Очень слабая начальная гравитация
-        const gravityTransitionPeriod = 100; // Период перехода к полной гравитации
-        const currentGravity = gracePeriod > gravityTransitionPeriod 
-            ? initialGravity 
-            : initialGravity + (gravity - initialGravity) * (1 - gracePeriod / gravityTransitionPeriod);
+        const initialGravity = 0.001; // Немного увеличиваем начальную гравитацию
+        const gravityTransitionPeriod = 400; // Оставляем тот же период перехода
+        const currentGravity = gracePeriod > 0 
+            ? initialGravity + (gravity - initialGravity) * ((gravityTransitionPeriod - gracePeriod) / gravityTransitionPeriod)
+            : gravity;
+        
+        // Отладочный вывод каждые 30 кадров
+        if (gracePeriod % 30 === 0) {
+            console.log(`[DEBUG] Current gravity: ${currentGravity}, Grace period: ${gracePeriod}`);
+        }
         
         // Update bird position with time multiplier and dynamic gravity
         birdVelocity += currentGravity * timeMultiplier;
@@ -519,9 +557,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Check boundary collisions after grace period
-        if (gracePeriod <= 0 && (birdY < 0 || birdY + bird.clientHeight > gameArea.clientHeight)) {
-            console.log('[DEBUG] Collision with boundary, bird position:', birdY);
+        // Check boundary collisions - верхнюю границу проверяем после grace period, нижнюю - всегда
+        if (birdY < 0 && gracePeriod <= 0) {
+            console.log('[DEBUG] Collision with top boundary, bird position:', birdY);
+            endGame();
+            return;
+        }
+        if (birdY + bird.clientHeight > gameArea.clientHeight) {
+            console.log('[DEBUG] Collision with bottom boundary, bird position:', birdY);
             endGame();
             return;
         }
@@ -558,7 +601,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             canRestartGame = true;
             console.log('[DEBUG] New game can be started');
-        }, 2000);
+        }, 1000);
     }
     
     // Звук окончания игры
@@ -650,10 +693,17 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
         }
         
+        // Проверяем, не отображается ли загрузочный экран
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            console.log('[DEBUG] Cannot handle interaction while loading screen is visible');
+            return false;
+        }
+        
         if (!gameStarted) {
             if (gameOver && !canRestartGame) {
                 console.log('[DEBUG] Please wait before starting a new game');
-                return;
+                return false;
             }
             startGame();
         } else {
@@ -667,6 +717,14 @@ document.addEventListener('DOMContentLoaded', function() {
     jumpButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        // Проверяем, не отображается ли загрузочный экран
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            console.log('[DEBUG] Cannot jump while loading screen is visible');
+            return;
+        }
+        
         if (!gameStarted) {
             if (gameOver && !canRestartGame) {
                 console.log('[DEBUG] Подождите перед началом новой игры');
